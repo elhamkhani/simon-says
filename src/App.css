@@ -21,11 +21,18 @@
 
 .selected{
   opacity: 1;
-}
+  animation-name: example;
+  animation-duration: 0.5s;
+  }
 
 .box-holder{
   width: 250px;
   margin-left: 43%;
+}
+
+.game-over{
+  color: red;
+  font-size: x-large;
 }
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {

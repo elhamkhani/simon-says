@@ -4,42 +4,62 @@ import Box from './components/box';
 
 function App() {
   
+  const [gameState, setGameState] = useState('active');
   const [sequence, setSequence] = useState([]);
-  const [currentSelection, setCurrentSelection] = useState(0);
+  const [currentSelection, setCurrentSelection] = useState(-1);
+  const [playerLevel, setPlayerLevel] = useState(0);
+
   const level = sequence.length;
   
   useEffect(() => {
-    if (currentSelection > 0 && currentSelection <= sequence.length ) {
+    if (currentSelection > -1 && currentSelection <= sequence.length ) {
       const timerId = setTimeout(() => {
-        const newSelection = currentSelection + 1;
-        setCurrentSelection(newSelection);
+        setCurrentSelection(currentSelection + 1);
       }, 1000);
       return () => clearTimeout(timerId);
     }else{
-      setCurrentSelection(0);
+      setCurrentSelection(-1);
     } 
 
   });
 
   const newRound = () => {
-    const next = Math.floor(Math.random() * 4) + 1;
+    const next = Math.floor(Math.random() * 4);
     const newSequence = sequence.concat(next);
     setSequence(newSequence);
-    setCurrentSelection(1);
+    setCurrentSelection(0);
   };
   
+  const onClick = (num) => {
+    if(newRoundEnabled)
+    return;
+
+   if(sequence[playerLevel]!==num)
+   {
+    setGameState('lost');
+   }
+   
+    (sequence.length === playerLevel + 1)? setPlayerLevel(0): setPlayerLevel(playerLevel + 1);
+   
+  }
+
+  const newRoundEnabled = currentSelection === -1 && playerLevel === 0;
+
+  const colours = ['red','blue', 'green', 'orange'];
   return (
       <div className="App">
-        <button onClick={newRound}>New Round</button>
-        <div class="box-holder">
-          <Box colour='red' key={1} state={sequence[currentSelection-1] === 1 ? 'selected':'not-selected'}/>
-          <Box colour='blue' key={2} state={sequence[currentSelection-1] === 2 ? 'selected':'not-selected'}/>
-          <Box colour='green' key={3} state={sequence[currentSelection-1] === 3 ? 'selected':'not-selected'}/>
-          <Box colour='yellow' key={4} state={sequence[currentSelection-1] === 4 ? 'selected':'not-selected'}/>
+        {gameState ==='lost'? <div className='game-over' >Game Over</div>:''}
+
+        <button onClick={newRound} disabled={newRoundEnabled?'':'disabled'}>New Round</button>
+        <div className="box-holder">
+          {colours.map((c,i)=>
+          <Box 
+          colour={c} 
+          num={i} 
+          key={i} 
+          state={sequence[currentSelection-1] === i || sequence[playerLevel] === i? 'selected':'not-selected'} 
+          onClick={onClick}/>)}
         </div>
-        <div>level: {level}</div>
-        <div>sequence: {sequence}</div>
-        <div>currentSelection: {currentSelection}</div>
       </div>
    );
 }
